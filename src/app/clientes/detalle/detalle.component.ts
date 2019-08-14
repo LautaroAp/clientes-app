@@ -4,6 +4,9 @@ import { ClienteService } from '../cliente.service';
 import Swal from 'sweetalert2';
 import { HttpEventType } from '@angular/common/http';
 import { ModalService } from './modal.service';
+import { AuthService } from 'src/app/usuarios/auth.service';
+import { FacturaService } from 'src/app/facturas/services/factura.service';
+import { Factura } from 'src/app/facturas/models/factura';
 
 @Component({
   selector: 'detalle-cliente',
@@ -17,7 +20,9 @@ export class DetalleComponent implements OnInit {
   progreso: number = 0;
 
   constructor( private clienteService: ClienteService,
-    private modalService: ModalService) { }
+    private modalService: ModalService,
+    private authService: AuthService,
+    private facturaService: FacturaService) { }
 
   ngOnInit() {
 
@@ -56,6 +61,41 @@ export class DetalleComponent implements OnInit {
     this.modalService.cerrarModal();
     this.fotoSeleccionada = null;
     this.progreso = 0;
+  }
+
+  delete(factura: Factura): void {
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger'
+      },
+      buttonsStyling: false,
+    })
+    
+    swalWithBootstrapButtons.fire({
+      title: '¿Esta seguro?',
+      text: `Seguro que desea eliminar al cliente ${factura.descripcion}?`,
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Si, eliminar!',
+      cancelButtonText: 'No, cancelar!',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.value) {
+        this.facturaService.delete(factura.id).subscribe(
+          () =>{
+            // ".filter" no muestra al cliente eliminado
+            this.cliente.facturas = this.cliente.facturas.filter(f => f !== factura);
+
+            swalWithBootstrapButtons.fire(
+              'Factura Eliminada!',
+              `Factura ${factura.descripcion} eliminada con éxito!`,
+              'success'
+            )
+          }
+        )
+      }
+    })
   }
 
 }

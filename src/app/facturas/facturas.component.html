@@ -1,0 +1,88 @@
+<div class="card bg-light">
+    <div class="card-header">{{titulo}}: {{factura.descripcion}}</div>
+    <div class="card-body">
+        <h4 class="card-title">
+            <a [routerLink]="['/clientes']" class="btn btn-light btn-xs">&laquo; volver</a>
+        </h4>
+        <form>
+            <div class="form-group row" *ngIf="factura.cliente">
+                <label for="cliente" class="col-sm-2 col-form-label">Cliente</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" name="cliente" id="cliente"
+                        value="{{factura.cliente.nombre}}  {{factura.cliente.apellido}}" disabled>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="descripcion" class="col-sm-2 col-form-label">Descripcion</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" name="descripcion" id="descripcion"
+                        [(ngModel)]="factura.descripcion">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="observacion" class="col-sm-2 col-form-label">Observacion</label>
+                <div class="col-sm-6">
+                    <textarea class="form-control" name="observacion" id="observacion"
+                        [(ngModel)]="factura.observacion"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-6">
+                    <mat-form-field>
+                        <input type="text" placeholder="Añadir producto" aria-label="Productos" matInput
+                            [formControl]="autocompleteControl" [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete" [displayWith]='mostrarNombre'
+                            (optionSelected)="seleccionarProducto($event)">
+                            <mat-option *ngFor="let producto of productosFiltrados | async" [value]="producto">
+                                {{producto.nombre}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div *ngIf="factura.items.length" class="alert alert-info-my-4">
+                No existen facturas asignadas.
+            </div>
+
+            <table class="table table-hover table-striped table-sm my-3">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of factura.items">
+                        <td>{{item.producto.nombre}}</td>
+                        <td>{{item.producto.precio}}</td>
+                        <td>
+                            <input type="number" value="{{item.cantidad}}" class="form-control col-sm-4"
+                                (change)="actualizarCantidad(item.producto.id, $event)">
+                        </td>
+                        <td>{{item.calcularImporte()}}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" type="button"
+                                (click)="eliminarItemFactura(item.producto.id)">
+                                x
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5 class="float-right">Total: <span class="badge badge-secondary">{{factura.calcularGranTotal()}}</span>
+            </h5>
+            
+            <div class="form-group row">
+                <div class="col-sm-6">
+                    <input type="submit" class="btn btn-secondary" value="Crear Factura">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

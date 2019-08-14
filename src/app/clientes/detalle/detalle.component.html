@@ -12,7 +12,7 @@
           <div class="container">
             <div class="row">
               <div class="col-sm">
-      
+
                 <ul *ngIf="cliente" class="list-group text-dark mb-3">
                   <li class="list-group-item">{{cliente.nombre}}</li>
                   <li class="list-group-item">{{cliente.apellido}}</li>
@@ -20,28 +20,71 @@
                   <li class="list-group-item">{{cliente.createAt | date:"fullDate"}}</li>
                   <li class="list-group-item">{{cliente.region.nombre}}</li>
                 </ul>
-      
-                <div class="input-group mb-3">
+
+                <div *ngIf="authService.hasRole('ROLE_ADMIN')" class="input-group mb-3">
                   <div class="custom-file">
-                    <input (change)="seleccionarFoto($event)" type="file" class="custom-file-input" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04">
+                    <input (change)="seleccionarFoto($event)" type="file" class="custom-file-input"
+                      id="inputGroupFile04" aria-describedby="inputGroupFileAddon04">
                     <label class="custom-file-label" for="inputGroupFile04">Seleccionar foto</label>
                   </div>
                   <div class="input-group-append">
-                    <button (click)="subirFoto()" [disabled]="!fotoSeleccionada" class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04">Subir</button>
+                    <button (click)="subirFoto()" [disabled]="!fotoSeleccionada" class="btn btn-outline-secondary"
+                      type="button" id="inputGroupFileAddon04">Subir</button>
                   </div>
                 </div>
-      
+
                 <div *ngIf="progreso > 0" class="progress">
-                  <div class="progress-bar" role="progressbar" [ngStyle]="{width:progreso+'%'}" attr.aria-valuenow="{{progreso}}" aria-valuemin="0" aria-valuemax="100">
+                  <div class="progress-bar" role="progressbar" [ngStyle]="{width:progreso+'%'}"
+                    attr.aria-valuenow="{{progreso}}" aria-valuemin="0" aria-valuemax="100">
                     {{progreso}}%
                   </div>
                 </div>
-      
+
               </div>
               <div class="col-sm">
-                <img *ngIf="cliente?.foto" src="http://localhost:8080/api/uploads/img/{{cliente.foto}}" 
-                    alt="{{cliente.foto}}" class="img-thumbnail rounded">
+                <img *ngIf="cliente?.foto" src="http://localhost:8080/api/uploads/img/{{cliente.foto}}"
+                  alt="{{cliente.foto}}" class="img-thumbnail rounded">
               </div>
+            </div>
+
+            <div class="row">
+                <button type="button" class="btn btn-success btn-sm" [routerLink]="['/facturas/form', cliente.id]">Crear Factura</button>
+            </div>
+
+            <div class="row">
+              <div *ngIf="cliente.facturas.length==0" class="alert alert-info my-4">
+                No existen facturas asignadas al cliente '{{cliente.nombre}} {{cliente.apellido}}'.
+              </div>
+              <table *ngIf="cliente.facturas.length>0" class="table table-bordered table-striped my-4">
+                <thead>
+                  <tr>
+                    <th>folio</th>
+                    <th>descripcion</th>
+                    <th>fecha</th>
+                    <th>total</th>
+                    <th>detalle</th>
+                    <th>eliminar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let factura of cliente.facturas">
+                    <td>{{factura.id}}</td>
+                    <td>{{factura.descripcion}}</td>
+                    <td>{{factura.createAt}}</td>
+                    <td>{{factura.total}}</td>
+                    <td>
+                      <button class="btn btn-primary btn-sm" type="button" [routerLink]="['/facturas', factura.id]">
+                        ver
+                      </button>
+                    </td>
+                    <td>
+                      <button class="btn btn-danger btn-sm" type="button" (click)="delete(factura)">
+                        eliminar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

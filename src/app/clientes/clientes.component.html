@@ -6,7 +6,7 @@
     <h5 class="card-title">Listado de clientes</h5>
 
     <div class="my-2 text-left">
-      <button class="btn btn-rounded btn-primary" type="button" [routerLink] = "['/clientes/form']">Crear Cliente</button>
+      <button *ngIf="authService.hasRole('ROLE_ADMIN')" class="btn btn-rounded btn-primary" type="button" [routerLink] = "['/clientes/form']">Crear Cliente</button>
     </div>
 
     <div class="alert alert-info" *ngIf="clientes?.length == 0">
@@ -16,18 +16,21 @@
     <table class="table table-bordered table-striped" *ngIf="clientes?.length > 0">
       <thead>
         <tr>
+          <!-- <th *ngIf="authService.hasRole('ROLE_USER')">#</th> -->
           <th>#</th>
           <th>nombre</th>
           <th>apellido</th>
           <th>email</th>
           <th>fecha</th>
-          <th>editar</th>
-          <th>eliminar</th>
+          <th>crear factura</th>
+          <th *ngIf="authService.hasRole('ROLE_ADMIN')">editar</th>
+          <th *ngIf="authService.hasRole('ROLE_ADMIN')">eliminar</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let cliente of clientes">
-          <td>
+          <!-- <td *ngIf="authService.hasRole('ROLE_USER')"> -->
+            <td>
               <img (click)="abrirModal(cliente)" *ngIf="cliente?.foto" src="http://localhost:8080/api/uploads/img/{{cliente.foto}}" 
                   alt="{{cliente.foto}}" class="img-thumbnail rounded" style="width: 48px; cursor: pointer;">
               <img (click)="abrirModal(cliente)" *ngIf="!cliente?.foto" src="http://localhost:8080/images/no-usuario.png" 
@@ -38,9 +41,12 @@
           <td>{{ cliente.email}}</td>
           <td>{{ cliente.createAt | date:"EEEE dd, MMMM yyyy"}}</td>
           <td>
+            <button type="button" class="btn btn-success btn-sm" [routerLink]="['/facturas/form', cliente.id]">Crear Factura</button>
+          </td>
+          <td *ngIf="authService.hasRole('ROLE_ADMIN')">
             <button type="button" name="editar" [routerLink]="['/clientes/form', cliente.id]" class="btn btn-primary">editar</button>
           </td>
-          <td>
+          <td *ngIf="authService.hasRole('ROLE_ADMIN')">
             <button type="button" name="eliminar" class="btn btn-danger" (click)="delete(cliente)">eliminar</button>
           </td>
         </tr>
