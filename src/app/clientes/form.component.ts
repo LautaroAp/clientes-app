@@ -11,10 +11,10 @@ import { Region } from './region';
 })
 export class FormComponent implements OnInit {
 
-  private cliente: Cliente = new Cliente();
-  private titulo: string = "Crear Cliente";
-  private errores: string[];
-  private regiones: Region[];
+  public cliente: Cliente = new Cliente();
+  titulo: string = "Crear Cliente";
+  errores: string[];
+  regiones: Region[];
 
   constructor(private clienteService: ClienteService, 
     private router: Router, 
@@ -50,6 +50,7 @@ export class FormComponent implements OnInit {
   }
 
   update(): void{
+    this.cliente.facturas = null;
     this.clienteService.update(this.cliente)
     .subscribe( json => {
       this.router.navigate(['/clientes'])

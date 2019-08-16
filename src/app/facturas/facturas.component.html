@@ -4,7 +4,7 @@
         <h4 class="card-title">
             <a [routerLink]="['/clientes']" class="btn btn-light btn-xs">&laquo; volver</a>
         </h4>
-        <form>
+        <form #facturaForm="ngForm">
             <div class="form-group row" *ngIf="factura.cliente">
                 <label for="cliente" class="col-sm-2 col-form-label">Cliente</label>
                 <div class="col-sm-6">
@@ -16,7 +16,11 @@
                 <label for="descripcion" class="col-sm-2 col-form-label">Descripcion</label>
                 <div class="col-sm-6">
                     <input type="text" class="form-control" name="descripcion" id="descripcion"
-                        [(ngModel)]="factura.descripcion">
+                        [(ngModel)]="factura.descripcion" required #descripcion="ngModel">
+                    <div class="alert alert-danger"
+                        *ngIf="descripcion.invalid && descripcion.touched || descripcion.invalid && facturaForm.submitted">
+                        Campo requerido.
+                    </div>
                 </div>
             </div>
             <div class="form-group row">
@@ -39,10 +43,16 @@
                             </mat-option>
                         </mat-autocomplete>
                     </mat-form-field>
+
+                    <div class="alert alert-danger"
+                        *ngIf="autocompleteControl.invalid && facturaForm.submitted">
+                        La factura debe tener uno o mas items.
+                    </div>
+
                 </div>
             </div>
 
-            <div *ngIf="factura.items.length" class="alert alert-info-my-4">
+            <div *ngIf="factura.items.length == 0" class="alert alert-info my-4">
                 No existen facturas asignadas.
             </div>
 
@@ -75,12 +85,13 @@
                 </tbody>
             </table>
 
-            <h5 class="float-right">Total: <span class="badge badge-secondary">{{factura.calcularGranTotal()}}</span>
+            <h5 class="float-right">
+                Total: <span class="badge badge-secondary">{{factura.calcularGranTotal()}}</span>
             </h5>
-            
+
             <div class="form-group row">
                 <div class="col-sm-6">
-                    <input type="submit" class="btn btn-secondary" value="Crear Factura">
+                    <input type="submit" class="btn btn-secondary" value="Crear Factura" (click)="create(facturaForm)">
                 </div>
             </div>
         </form>
